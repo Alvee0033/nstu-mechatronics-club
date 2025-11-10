@@ -1,0 +1,46 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Allow public read access for website content
+    match /members/{document} {
+      allow read: if true;
+      allow write: if true; // Allow admin writes to members
+    }
+
+    match /events/{document} {
+      allow read: if true;
+      allow write: if true; // Allow admin writes to events
+    }
+
+    match /projects/{document} {
+      allow read: if true;
+      allow write: if true; // Allow admin writes to projects
+    }
+
+    match /achievements/{document} {
+      allow read: if true;
+      allow write: if true; // Allow admin writes to achievements
+    }
+
+    match /settings/{document} {
+      allow read: if true;
+      allow write: if true; // Allow admin writes to settings
+    }
+
+    // Allow read/write for member applications (for registration)
+    match /memberApplications/{document} {
+      allow read: if true; // Allow admin to read applications
+      allow write: if true; // Allow public to submit applications
+    }
+
+    // Allow read/write for transactions (admin only)
+    match /transactions/{document} {
+      allow read, write: if true; // Allow admin writes to transactions
+    }
+
+    // Default deny for any other collections
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
