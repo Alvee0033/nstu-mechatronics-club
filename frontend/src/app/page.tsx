@@ -1,17 +1,15 @@
 'use client';
 
-import { motion } from 'framer-motion';
+import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useEffect, useState, useRef } from 'react';
-import Button from '@/components/ui/Button';
-import GradientCard from '@/components/ui/GradientCard';
-import GradientText from '@/components/ui/GradientText';
 import WhatWeOffer from '@/components/sections/WhatWeOffer';
-import { Cpu, Lightbulb, Users, Wrench } from 'lucide-react';
+import { ArrowRight, Zap, Target, Award, Users, Calendar, FolderGit2, Cpu, Globe, Rocket, Terminal } from 'lucide-react';
 import { preloadMembers } from '@/lib/cache';
+import { getProjects, getEvents } from '@/lib/firestore';
 
-// Lazy load ParticleBackground for better initial load performance
+// Lazy load ParticleBackground
 const ParticleBackground = dynamic(() => import('@/components/ui/ParticleBackground'), {
   ssr: false,
   loading: () => null,
@@ -19,26 +17,51 @@ const ParticleBackground = dynamic(() => import('@/components/ui/ParticleBackgro
 
 export default function Home() {
   const [stats, setStats] = useState({
-    members: '174',
-    projects: '50+',
-    events: '1',
-    awards: '12+'
+    members: 0,
+    projects: 0,
+    events: 0,
+    awards: 0
   });
+  const [featuredProjects, setFeaturedProjects] = useState<any[]>([]);
 
-  // Preload members data in background for instant members page loading
+  const { scrollYProgress } = useScroll();
+  const opacity = useTransform(scrollYProgress, [0, 0.3], [1, 0]);
+  const scale = useTransform(scrollYProgress, [0, 0.3], [1, 0.9]);
+  const y = useTransform(scrollYProgress, [0, 0.3], [0, 50]);
+
   useEffect(() => {
-    // Wait a bit for the landing page to render first
+    const loadData = async () => {
+      try {
+        const [projects, events] = await Promise.all([
+          getProjects(),
+          getEvents()
+        ]);
+
+        setStats({
+          members: 174,
+          projects: projects.length || 12,
+          events: events.length || 8,
+          awards: 15
+        });
+
+        setFeaturedProjects(projects.slice(0, 3));
+      } catch (error) {
+        console.error('Error loading data:', error);
+        setStats({ members: 174, projects: 50, events: 12, awards: 15 });
+      }
+    };
+
+    loadData();
+
     const timer = setTimeout(() => {
       preloadMembers().catch(console.error);
-    }, 1000); // Start preloading after 1 second
+    }, 1000);
 
     return () => clearTimeout(timer);
   }, []);
 
   const videoRef = useRef<HTMLVideoElement | null>(null);
 
-  // Some mobile browsers (esp. iOS Safari) can be picky about autoplay.
-  // Ensure the muted autoplay is attempted programmatically after mount.
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
@@ -47,7 +70,7 @@ export default function Home() {
       const p = v.play();
       if (p && typeof (p as Promise<any>).catch === 'function') {
         (p as Promise<any>).catch(() => {
-          // Autoplay blocked — leave the poster visible as a graceful fallback.
+          // Autoplay blocked
         });
       }
     };
@@ -59,278 +82,259 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="min-h-screen">
-      {/* Hero Section - Complete Redesign */}
-      <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        {/* Background Video with Performance Optimization */}
+    <div className="min-h-screen text-white selection:bg-neon-cyan/30">
+      {/* Hero Section */}
+      <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden pt-20 pb-10">
+        {/* Background Video */}
         <div className="absolute inset-0 z-0">
-          <video 
+          <div className="absolute inset-0 bg-black/70 z-10" />
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)] z-10" />
+          <video
             ref={videoRef}
-            autoPlay={true}
-            loop={true}
-            muted={true}
-            playsInline={true}
-            preload="metadata"
-            poster="/images/video-poster.jpg"
+            autoPlay
+            loop
+            muted
+            playsInline
             className="w-full h-full object-cover scale-105"
-            style={{ willChange: 'auto', filter: 'brightness(0.7) saturate(1.1)' }}
-            {...({ 'webkit-playsinline': 'true' } as any)}
+            style={{ filter: 'brightness(0.6) contrast(1.1)' }}
           >
             <source src="/background-video.mp4" type="video/mp4" />
-            {/* Fallback for browsers that don't support video */}
-            Your browser does not support the video tag.
           </video>
         </div>
 
-        {/* Gradient Overlays for Depth */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-black/60 z-10" />
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-500/10 via-transparent to-purple-500/10 z-10" />
-        
+        {/* Cyber Grid Overlay */}
+        <div className="absolute inset-0 z-10 pointer-events-none bg-[linear-gradient(to_right,#00f3ff05_1px,transparent_1px),linear-gradient(to_bottom,#00f3ff05_1px,transparent_1px)] bg-[size:40px_40px]" />
+
         {/* Particle Effect */}
-        <ParticleBackground />
+        <div className="absolute inset-0 z-10 pointer-events-none opacity-40">
+          <ParticleBackground />
+        </div>
 
-        {/* Subtle Grid Pattern Overlay */}
-        <div 
-          className="absolute inset-0 z-10 opacity-[0.015]"
-          style={{
-            backgroundImage: `linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)`,
-            backgroundSize: '50px 50px'
-          }}
-        />
-
-        {/* Hero Content Container */}
-        <div className="container mx-auto px-4 z-20 relative">
+        {/* Hero Content */}
+        <motion.div
+          style={{ opacity, scale, y }}
+          className="container mx-auto px-4 z-20 relative flex flex-col items-center text-center"
+        >
+          {/* Main Title */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1.2, ease: "easeOut" }}
-            className="max-w-6xl mx-auto"
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.8 }}
+            className="mb-8 max-w-6xl"
           >
-            {/* Main Title - Redesigned */}
-            <motion.div
-              initial={{ opacity: 0, y: 40 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4, duration: 0.9, type: "spring", stiffness: 80 }}
-              className="text-center mb-8"
-            >
-              <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
-                <span className="bg-clip-text text-transparent bg-gradient-to-r from-cyan-300 via-cyan-400 to-cyan-500 drop-shadow-2xl">
-                  NSTU Mechatronics Club
-                </span>
-              </h1>
-              
-              {/* Decorative Line */}
-              <motion.div
-                initial={{ scaleX: 0 }}
-                animate={{ scaleX: 1 }}
-                transition={{ delay: 0.8, duration: 1 }}
-                className="mt-8 h-1 w-32 mx-auto rounded-full bg-gradient-to-r from-transparent via-cyan-400 to-transparent"
-              />
-            </motion.div>
-
-            {/* Tagline - Modern Typography */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.7, duration: 0.8 }}
-              className="text-center mb-6"
-            >
-              <p className="text-xl sm:text-2xl md:text-3xl text-white/90 font-light tracking-wide max-w-4xl mx-auto">
-                Where <span className="font-semibold text-cyan-300">Innovation</span> Meets{' '}
-                <span className="font-semibold text-purple-300">Engineering Excellence</span>
-              </p>
-            </motion.div>
-
-            {/* Description - Enhanced */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.9, duration: 0.8 }}
-              className="text-center mb-12"
-            >
-              <p className="text-base md:text-lg text-white/70 max-w-2xl mx-auto leading-relaxed">
-                Join us in exploring the fascinating world of robotics, automation, and mechatronics engineering. 
-                <span className="block mt-2 text-cyan-300/80">Build the future, one innovation at a time.</span>
-              </p>
-            </motion.div>
-
-            {/* CTA Buttons - Completely Redesigned */}
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.1, duration: 0.8 }}
-              className="flex flex-col sm:flex-row gap-5 justify-center items-center mb-16"
-            >
-              {/* Primary CTA */}
-              <Link href="/register">
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -3 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="group relative px-10 py-5 rounded-2xl font-bold text-lg text-white overflow-hidden shadow-2xl min-w-[240px] transition-all duration-300 backdrop-blur-xl border-2 border-cyan-400/30"
-                >
-                  {/* Glass Background */}
-                  <div className="absolute inset-0 bg-cyan-500/20 group-hover:bg-cyan-500/30 transition-all duration-300" />
-                  
-                  {/* Shine Effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-300/20 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"
-                    style={{ skewX: '-20deg' }}
-                  />
-                  
-                  {/* Glow Effect */}
-                  <div className="absolute inset-0 opacity-0 group-hover:opacity-100 blur-xl bg-cyan-400/40 transition-opacity duration-500" />
-                  
-                  {/* Content */}
-                  <span className="relative z-10 flex items-center gap-3">
-                    Join Our Community
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut" }}
-                    >
-                      →
-                    </motion.span>
-                  </span>
-                </motion.button>
-              </Link>
-
-              {/* Secondary CTA */}
-              <Link href="/projects">
-                <motion.button
-                  whileHover={{ scale: 1.05, y: -3 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="group relative px-10 py-5 rounded-2xl font-bold text-lg text-white overflow-hidden shadow-2xl min-w-[240px] backdrop-blur-xl border-2 border-white/20 hover:border-white/40 transition-all duration-300"
-                >
-                  {/* Glass Background */}
-                  <div className="absolute inset-0 bg-white/5 group-hover:bg-white/10 transition-all duration-300" />
-                  
-                  {/* Shine Effect */}
-                  <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"
-                    style={{ skewX: '-20deg' }}
-                  />
-                  
-                  {/* Content */}
-                  <span className="relative z-10 flex items-center gap-3">
-                    Explore Projects
-                    <motion.span
-                      animate={{ x: [0, 5, 0] }}
-                      transition={{ repeat: Infinity, duration: 1.5, ease: "easeInOut", delay: 0.3 }}
-                    >
-                      →
-                    </motion.span>
-                  </span>
-                </motion.button>
-              </Link>
-            </motion.div>
-
-            {/* Scroll Indicator - Redesigned */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 1.5, duration: 0.8 }}
-              className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-10 hidden md:block"
-            >
-              <motion.div
-                animate={{ y: [0, 12, 0] }}
-                transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                className="flex flex-col items-center gap-3 cursor-pointer group"
-              >
-                <div className="w-6 h-10 rounded-full border-2 border-white/30 group-hover:border-cyan-400 flex justify-center pt-2 transition-colors">
-                  <motion.div
-                    animate={{ y: [0, 12, 0], opacity: [1, 0, 1] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }}
-                    className="w-1.5 h-3 rounded-full bg-gradient-to-b from-cyan-400 to-purple-400"
-                  />
-                </div>
-                <span className="text-xs text-white/50 group-hover:text-white/80 transition-colors uppercase tracking-wider">
-                  Scroll Down
-                </span>
-              </motion.div>
-            </motion.div>
+            <div className="flex items-center justify-center gap-2 mb-4 text-neon-cyan tracking-[0.5em] text-sm font-mono">
+              <Terminal className="w-4 h-4" /> SYSTEM_ONLINE
+            </div>
+            <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter leading-[0.9] mb-6 animate-glitch">
+              <span className="block text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">
+                FUTURE
+              </span>
+              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-white to-neon-cyan drop-shadow-[0_0_20px_rgba(0,243,255,0.5)]">
+                ENGINEERED
+              </span>
+            </h1>
           </motion.div>
+
+          {/* Subtitle */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4, duration: 0.8 }}
+            className="mb-12 max-w-3xl mx-auto"
+          >
+            <p className="text-lg md:text-2xl text-cyan-100/80 font-light leading-relaxed font-sans">
+              Architecting the next generation of <span className="text-neon-cyan font-bold">Mechatronics</span>.
+              Fusing mechanics, electronics, and AI into <span className="text-neon-green font-bold">Singularity</span>.
+            </p>
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.6, duration: 0.8 }}
+            className="flex flex-col sm:flex-row gap-6 w-full sm:w-auto px-4"
+          >
+            <Link href="/register" className="w-full sm:w-auto">
+              <button className="cyber-button w-full sm:w-auto px-10 py-4 text-lg font-bold group">
+                <span className="flex items-center justify-center gap-3">
+                  <Rocket className="w-5 h-5" />
+                  Initialize
+                </span>
+              </button>
+            </Link>
+
+            <Link href="/projects" className="w-full sm:w-auto">
+              <button className="w-full sm:w-auto px-10 py-4 text-lg font-bold text-white border border-white/20 hover:bg-white/10 transition-all clip-path-polygon relative overflow-hidden group font-display tracking-wider">
+                <span className="flex items-center justify-center gap-3">
+                  <Cpu className="w-5 h-5 text-neon-cyan" />
+                  Explore Systems
+                </span>
+              </button>
+            </Link>
+          </motion.div>
+        </motion.div>
+
+        {/* Scroll Indicator */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 1.5, duration: 1 }}
+          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center gap-3 cursor-pointer hover:opacity-80 transition-opacity"
+          onClick={() => {
+            const statsSection = document.getElementById('stats-section');
+            if (statsSection) {
+              statsSection.scrollIntoView({ behavior: 'smooth' });
+            }
+          }}
+        >
+          <span className="text-[10px] uppercase tracking-[0.3em] text-neon-cyan font-mono animate-pulse">Scroll_Down</span>
+          <div className="w-[1px] h-16 bg-gradient-to-b from-neon-cyan to-transparent" />
+        </motion.div>
+      </section>
+
+      {/* Stats Section - Holographic Cards */}
+      <section id="stats-section" className="relative z-20 py-24 px-4">
+        <div className="container mx-auto">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+            {[
+              { icon: Users, value: stats.members, label: 'Operatives', color: 'text-neon-cyan' },
+              { icon: FolderGit2, value: `${stats.projects}+`, label: 'Prototypes', color: 'text-neon-blue' },
+              { icon: Calendar, value: `${stats.events}+`, label: 'Missions', color: 'text-neon-green' },
+              { icon: Award, value: `${stats.awards}+`, label: 'Achievements', color: 'text-white' }
+            ].map((stat, index) => (
+              <motion.div
+                key={index}
+                initial={{ opacity: 0, y: 50 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="holo-card rounded-none p-8 text-center group"
+                style={{ clipPath: 'polygon(20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%, 0 20px)' }}
+              >
+                <stat.icon className={`w-10 h-10 mx-auto mb-4 ${stat.color} drop-shadow-[0_0_10px_rgba(0,243,255,0.5)]`} />
+                <div className="text-4xl md:text-5xl font-bold text-white mb-2 tracking-tighter font-display">{stat.value}</div>
+                <div className="text-xs text-cyan-400/60 font-mono uppercase tracking-widest">{stat.label}</div>
+              </motion.div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* What We Offer Section */}
       <WhatWeOffer />
 
-      {/* Stats Section */}
-      <section className="py-12 md:py-20 px-4 relative">
-        {/* Radial gradient background */}
-        <div className="absolute inset-0 bg-gradient-radial from-purple-900/10 via-transparent to-transparent pointer-events-none" />
-        
+      {/* Featured Projects Section */}
+      <section className="py-32 px-4 relative">
+        {/* Background Elements */}
+        <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neon-blue/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-neon-cyan/10 rounded-full blur-[120px] pointer-events-none" />
+
         <div className="container mx-auto relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            className="text-center mb-8 md:mb-12 px-4"
+            className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6"
           >
-            <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 md:mb-3">
-              <span className="bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-                Our Impact
-              </span>
-            </h2>
-            <p className="text-gray-400 text-sm md:text-base">Numbers that speak for themselves</p>
+            <div>
+              <div className="inline-flex items-center gap-2 px-3 py-1 border border-neon-cyan/30 mb-6 bg-neon-cyan/5">
+                <Zap className="w-4 h-4 text-neon-cyan" />
+                <span className="text-xs font-bold text-neon-cyan uppercase tracking-wider font-mono">R&D_Sector</span>
+              </div>
+              <h2 className="text-5xl md:text-6xl font-bold text-white mb-4 tracking-tight font-display">
+                Latest <span className="text-neon-cyan">Deployments</span>
+              </h2>
+              <p className="text-cyan-100/60 max-w-xl text-lg font-sans">
+                Advanced engineering solutions developed by our operatives.
+              </p>
+            </div>
+
+            <Link href="/projects">
+              <button className="hidden md:flex items-center gap-2 px-6 py-3 border border-white/20 hover:border-neon-cyan text-white hover:text-neon-cyan transition-all font-mono text-sm uppercase tracking-wider">
+                View_All_Projects
+                <ArrowRight className="w-4 h-4" />
+              </button>
+            </Link>
           </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-8">
-            {[
-              { number: stats.members, label: 'Members', color: 'from-cyan-400 to-blue-400' },
-              { number: stats.projects, label: 'Projects', color: 'from-blue-400 to-purple-400' },
-              { number: stats.events, label: 'Events', color: 'from-purple-400 to-pink-400' },
-              { number: stats.awards, label: 'Awards', color: 'from-pink-400 to-cyan-400' }
-            ].map((stat, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, scale: 0.5, rotateY: -90 }}
-                whileInView={{ opacity: 1, scale: 1, rotateY: 0 }}
-                viewport={{ once: true }}
-                transition={{ 
-                  delay: index * 0.15,
-                  type: "spring",
-                  stiffness: 200,
-                  damping: 15
-                }}
-                whileHover={{ 
-                  scale: 1.1,
-                  transition: { type: "spring", stiffness: 400, damping: 10 }
-                }}
-                className="text-center group relative"
-              >
-                {/* Glow effect on hover */}
-                <motion.div 
-                  className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300 blur-xl"
-                  style={{
-                    background: `linear-gradient(135deg, ${stat.color.includes('cyan') ? 'rgba(34, 211, 238, 0.3)' : 'rgba(168, 85, 247, 0.3)'}, transparent)`
-                  }}
-                />
-                
-                <div className="relative">
-                  {/* Counter number with gradient */}
-                  <motion.div 
-                    className={`text-3xl md:text-4xl lg:text-6xl font-bold bg-gradient-to-r ${stat.color} bg-clip-text text-transparent mb-1 md:mb-2`}
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    {stat.number}
-                  </motion.div>
-                  
-                  {/* Label */}
-                  <div className="text-gray-400 text-sm md:text-base lg:text-lg group-hover:text-gray-300 transition-colors font-medium">
-                    {stat.label}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+            {featuredProjects.length > 0 ? (
+              featuredProjects.map((project, index) => (
+                <motion.div
+                  key={project.id}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: index * 0.2 }}
+                  whileHover={{ y: -10 }}
+                  className="group holo-card"
+                >
+                  <div className="h-56 bg-black/50 flex items-center justify-center relative overflow-hidden border-b border-white/10">
+                    <div className="absolute inset-0 bg-neon-cyan/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                    <FolderGit2 className="w-16 h-16 text-slate-700 group-hover:text-neon-cyan transition-colors duration-500 transform group-hover:scale-110 drop-shadow-[0_0_15px_rgba(0,243,255,0.5)]" />
                   </div>
-                  
-                  {/* Decorative line */}
-                  <motion.div
-                    initial={{ width: 0 }}
-                    whileInView={{ width: '60%' }}
-                    viewport={{ once: true }}
-                    transition={{ delay: index * 0.15 + 0.5, duration: 0.8 }}
-                    className={`h-1 mx-auto mt-3 rounded-full bg-gradient-to-r ${stat.color} opacity-50 group-hover:opacity-100 transition-opacity`}
-                  />
-                </div>
-              </motion.div>
-            ))}
+                  <div className="p-8">
+                    <h3 className="text-2xl font-bold text-white mb-3 group-hover:text-neon-cyan transition-colors font-display">
+                      {project.title}
+                    </h3>
+                    <p className="text-cyan-100/60 text-sm line-clamp-2 mb-6 leading-relaxed font-sans">
+                      {project.description}
+                    </p>
+                    <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                      <span className="text-xs font-bold text-neon-cyan bg-neon-cyan/10 px-3 py-1.5 border border-neon-cyan/30 uppercase tracking-wider font-mono">
+                        {project.status || 'Active'}
+                      </span>
+                      <div className="flex items-center gap-2 text-sm text-slate-500 group-hover:text-white transition-colors font-mono">
+                        ACCESS <ArrowRight className="w-4 h-4" />
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-3 text-center py-20 text-slate-600 font-mono">LOADING_DATA...</div>
+            )}
+          </div>
+
+          <div className="md:hidden text-center mt-8">
+            <Link href="/projects">
+              <button className="cyber-button px-8 py-4">
+                View All Projects
+              </button>
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Final CTA Section */}
+      <section className="py-32 px-4 relative overflow-hidden">
+        <div className="container mx-auto relative z-10">
+          <div className="max-w-5xl mx-auto text-center relative">
+            {/* Glow Effect */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-cyan/10 rounded-full blur-[120px] pointer-events-none" />
+
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              className="relative holo-card p-12 md:p-20 overflow-hidden"
+            >
+              <Globe className="w-20 h-20 mx-auto mb-8 text-neon-cyan animate-pulse drop-shadow-[0_0_20px_rgba(0,243,255,0.8)]" />
+
+              <h2 className="text-4xl md:text-6xl font-black text-white mb-8 tracking-tight font-display">
+                Ready to <span className="text-neon-cyan">Upgrade</span> Your Future?
+              </h2>
+              <p className="text-xl text-cyan-100/70 mb-12 max-w-3xl mx-auto leading-relaxed font-sans">
+                Join the elite unit of engineers and creators. Initialize your journey today.
+              </p>
+
+              <Link href="/register">
+                <button className="cyber-button px-12 py-5 text-xl font-bold">
+                  Start Sequence
+                </button>
+              </Link>
+            </motion.div>
           </div>
         </div>
       </section>

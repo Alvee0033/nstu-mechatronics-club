@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Brain, CheckCircle, XCircle, RotateCcw } from 'lucide-react';
+import { Brain, CheckCircle, XCircle, RotateCcw, Trophy, ThumbsUp, BookOpen } from 'lucide-react';
 import GradientCard from '@/components/ui/GradientCard';
 
 interface QuizQuestion {
@@ -172,8 +172,14 @@ Content: ${allContent.substring(0, 2000)}`;
         </div>
 
         <div className="text-center py-8">
-          <div className="text-6xl mb-4">
-            {percentage >= 80 ? '🎉' : percentage >= 60 ? '👍' : '📚'}
+          <div className="mb-4 flex justify-center">
+            {percentage >= 80 ? (
+              <Trophy className="w-16 h-16 text-yellow-400" />
+            ) : percentage >= 60 ? (
+              <ThumbsUp className="w-16 h-16 text-green-400" />
+            ) : (
+              <BookOpen className="w-16 h-16 text-blue-400" />
+            )}
           </div>
           <h4 className="text-2xl font-bold text-white mb-2">
             {score}/{questions.length} Correct
@@ -223,17 +229,16 @@ Content: ${allContent.substring(0, 2000)}`;
               key={index}
               onClick={() => !showResult && handleAnswerSelect(index)}
               disabled={showResult}
-              className={`w-full text-left p-3 rounded-lg border transition-colors ${
-                showResult
+              className={`w-full text-left p-3 rounded-lg border transition-colors ${showResult
                   ? index === currentQuestion.correctAnswer
                     ? 'bg-green-500/20 border-green-500 text-green-100'
                     : index === selectedAnswer
-                    ? 'bg-red-500/20 border-red-500 text-red-100'
-                    : 'bg-gray-700/50 border-gray-600 text-white/60'
+                      ? 'bg-red-500/20 border-red-500 text-red-100'
+                      : 'bg-gray-700/50 border-gray-600 text-white/60'
                   : selectedAnswer === index
-                  ? 'bg-cyan-500/20 border-cyan-500 text-cyan-100'
-                  : 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-600/50'
-              }`}
+                    ? 'bg-cyan-500/20 border-cyan-500 text-cyan-100'
+                    : 'bg-gray-700/50 border-gray-600 text-white hover:bg-gray-600/50'
+                }`}
             >
               <div className="flex items-center space-x-3">
                 <span className="font-medium">

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
+import { Terminal, Shield, Lock } from 'lucide-react';
 
 export default function AdminLogin() {
   const router = useRouter();
@@ -12,7 +13,6 @@ export default function AdminLogin() {
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // Scroll to top when component mounts
     window.scrollTo(0, 0);
   }, []);
 
@@ -21,85 +21,101 @@ export default function AdminLogin() {
     setError('');
     setIsLoading(true);
 
-    // Simulate a small delay for better UX
     await new Promise(resolve => setTimeout(resolve, 500));
 
-    // Check credentials
     if (username === 'Alvee1177' && password === 'alvee6969') {
-      // Set session
       sessionStorage.setItem('adminLoggedIn', 'true');
       sessionStorage.setItem('adminUsername', username);
       sessionStorage.setItem('adminLoginTime', Date.now().toString());
-      
-      // Redirect to admin dashboard
       router.push('/admin');
     } else {
-      setError('Invalid username or password');
+      setError('ACCESS DENIED: Invalid credentials');
       setIsLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
+    <div className="min-h-screen bg-black flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Grid */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[linear-gradient(to_right,#00f3ff05_1px,transparent_1px),linear-gradient(to_bottom,#00f3ff05_1px,transparent_1px)] bg-[size:40px_40px]" />
+
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8, ease: "easeOut" }}
-        className="w-full max-w-md"
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-md relative z-10"
       >
-        <div className="bg-gray-800/95 border border-gray-700 rounded-xl p-8 shadow-xl backdrop-blur-sm">
-          <div className="text-center mb-8">
-            <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-300 to-blue-300 bg-clip-text text-transparent mb-2">
-              Admin Portal
+        <div className="holo-card p-8 md:p-10 relative overflow-hidden">
+          <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-neon-cyan to-transparent opacity-50" />
+
+          <div className="text-center mb-10">
+            <div className="w-16 h-16 mx-auto mb-6 bg-neon-cyan/10 rounded-full flex items-center justify-center border border-neon-cyan/30 animate-pulse-glow">
+              <Shield className="w-8 h-8 text-neon-cyan" />
+            </div>
+            <h1 className="text-3xl font-bold text-white font-display tracking-wide mb-2">
+              ADMIN <span className="text-neon-cyan">ACCESS</span>
             </h1>
-            <p className="text-gray-400 text-sm">
-              NSTU Mechatronics Club
-            </p>
+            <div className="flex items-center justify-center gap-2 text-xs text-cyan-100/50 font-mono tracking-widest uppercase">
+              <Terminal className="w-3 h-3" /> Secure Terminal
+            </div>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Username
+              <label className="block text-xs font-bold text-neon-cyan font-mono uppercase mb-2">
+                Operator ID
               </label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800/60 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
-                placeholder="Enter username"
+                className="w-full px-4 py-3 bg-black/50 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_15px_rgba(0,243,255,0.2)] transition-all font-mono text-sm"
+                placeholder="ENTER_ID"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-300 mb-2">
-                Password
+              <label className="block text-xs font-bold text-neon-cyan font-mono uppercase mb-2">
+                Access Key
               </label>
               <input
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full px-4 py-3 bg-gray-800/60 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:border-purple-400 focus:ring-2 focus:ring-purple-500/20 transition-all duration-200"
-                placeholder="Enter password"
+                className="w-full px-4 py-3 bg-black/50 border border-white/10 text-white placeholder-white/20 focus:outline-none focus:border-neon-cyan focus:shadow-[0_0_15px_rgba(0,243,255,0.2)] transition-all font-mono text-sm"
+                placeholder="ENTER_KEY"
                 required
               />
             </div>
 
             {error && (
-              <div className="p-3 bg-red-500/10 border border-red-500/30 rounded-lg text-red-400 text-sm">
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="p-3 bg-red-500/10 border border-red-500/30 text-red-500 text-xs font-mono flex items-center gap-2"
+              >
+                <Lock className="w-3 h-3" />
                 {error}
-              </div>
+              </motion.div>
             )}
 
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 bg-gradient-to-r from-purple-600 to-blue-600 text-white font-semibold rounded-lg transition-all duration-200 hover:from-purple-700 hover:to-blue-700 hover:shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
+              className="cyber-button w-full py-4 text-lg font-bold group relative overflow-hidden"
             >
-              {isLoading ? 'Authenticating...' : 'Access Admin Panel'}
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isLoading ? 'AUTHENTICATING...' : 'INITIALIZE SESSION'}
+              </span>
             </button>
           </form>
+
+          <div className="mt-8 pt-6 border-t border-white/5 text-center">
+            <p className="text-[10px] text-white/20 font-mono uppercase tracking-widest">
+              Restricted Access • Authorized Personnel Only
+            </p>
+          </div>
         </div>
       </motion.div>
     </div>

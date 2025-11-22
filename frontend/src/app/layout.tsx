@@ -1,14 +1,21 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Rajdhani, Orbitron } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 
-const inter = Inter({
-  variable: "--font-inter",
+const rajdhani = Rajdhani({
+  variable: "--font-rajdhani",
   subsets: ["latin"],
-  display: 'swap', // Add font-display: swap for better performance
-  preload: true,
+  weight: ['300', '400', '500', '600', '700'],
+  display: 'swap',
+});
+
+const orbitron = Orbitron({
+  variable: "--font-orbitron",
+  subsets: ["latin"],
+  weight: ['400', '500', '600', '700', '800', '900'],
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -20,8 +27,7 @@ export const metadata: Metadata = {
     maximumScale: 5,
     userScalable: true,
   },
-  themeColor: '#0a0a0a',
-  // Add performance-related meta tags
+  themeColor: '#000000',
   other: {
     'color-scheme': 'dark',
   },
@@ -35,13 +41,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <head>
-        {/* Preconnect to improve loading performance */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        {/* DNS prefetch for Firebase */}
         <link rel="dns-prefetch" href="https://firestore.googleapis.com" />
       </head>
-      <body className={`${inter.variable} antialiased bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 min-h-screen`}>
+      <body className={`${rajdhani.variable} ${orbitron.variable} font-sans antialiased bg-black min-h-screen selection:bg-cyan-500/30 selection:text-cyan-100`}>
         <Navbar />
         {children}
         <Footer />

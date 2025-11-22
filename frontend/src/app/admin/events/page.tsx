@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Search, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, X, Calendar, MapPin } from 'lucide-react';
 import { getEvents, addEvent, updateEvent, deleteEvent, Event } from '@/lib/firestore';
 import { Timestamp } from 'firebase/firestore';
 import AdminProtectedRoute from '@/components/admin/AdminProtectedRoute';
@@ -167,9 +167,17 @@ function AdminEventsContent() {
                   <p className="text-gray-400 text-sm mb-4 line-clamp-2">{event.description}</p>
                   <div className="space-y-2 text-sm text-gray-500 mb-4">
                     {event.date && (
-                      <div>📅 {event.date.toDate().toLocaleDateString()}</div>
+                      <div className="flex items-center gap-2">
+                        <Calendar className="w-4 h-4 text-cyan-400" />
+                        {event.date.toDate().toLocaleDateString()}
+                      </div>
                     )}
-                    {event.location && <div>📍 {event.location}</div>}
+                    {event.location && (
+                      <div className="flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-cyan-400" />
+                        {event.location}
+                      </div>
+                    )}
                     {event.category && (
                       <span className="inline-block px-3 py-1 bg-cyan-500/20 text-cyan-400 rounded-full text-xs">
                         {event.category}

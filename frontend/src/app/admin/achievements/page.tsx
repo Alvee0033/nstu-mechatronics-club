@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Edit2, Trash2, Search, X } from 'lucide-react';
+import { Plus, Edit2, Trash2, Search, X, Award, FileText } from 'lucide-react';
 import { getAchievements, addAchievement, updateAchievement, deleteAchievement, Achievement } from '@/lib/firestore';
 import { Timestamp } from 'firebase/firestore';
 import AdminProtectedRoute from '@/components/admin/AdminProtectedRoute';
@@ -66,7 +66,7 @@ function AdminAchievementsContent() {
       loadAchievements();
     } catch (error: any) {
       console.error('Error saving achievement:', error);
-      
+
       // Show more specific error messages
       let errorMessage = 'Failed to save achievement';
       if (error?.code) {
@@ -87,7 +87,7 @@ function AdminAchievementsContent() {
             errorMessage = `Error: ${error.code}`;
         }
       }
-      
+
       alert(errorMessage);
     }
   };
@@ -191,9 +191,17 @@ function AdminAchievementsContent() {
                   <p className="text-gray-400 text-sm mb-4 line-clamp-2">{achievement.description}</p>
                   <div className="space-y-2 text-sm text-gray-500 mb-4">
                     {achievement.date && (
-                      <div>🏆 {achievement.date.toDate().toLocaleDateString()}</div>
+                      <div className="flex items-center gap-2">
+                        <Award className="w-4 h-4 text-purple-400" />
+                        {achievement.date.toDate().toLocaleDateString()}
+                      </div>
                     )}
-                    {achievement.awardedBy && <div>📜 {achievement.awardedBy}</div>}
+                    {achievement.awardedBy && (
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-purple-400" />
+                        {achievement.awardedBy}
+                      </div>
+                    )}
                     {achievement.category && (
                       <span className="inline-block px-3 py-1 bg-purple-500/20 text-purple-400 rounded-full text-xs">
                         {achievement.category}

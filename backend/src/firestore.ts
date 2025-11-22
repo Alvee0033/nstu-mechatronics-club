@@ -20,6 +20,7 @@ export { Timestamp };
 export const COLLECTIONS = {
   EVENTS: 'events',
   PROJECTS: 'projects',
+  MEMBERS: 'members',
 };
 
 // Types
@@ -45,6 +46,20 @@ export interface Project {
   status?: 'completed' | 'ongoing' | 'planned';
   githubUrl?: string;
   demoUrl?: string;
+  createdAt?: Timestamp;
+}
+
+export interface Member {
+  id?: string;
+  name: string;
+  email?: string;
+  role?: string;
+  department?: string;
+  image?: string;
+  social?: {
+    linkedin?: string;
+    github?: string;
+  };
   createdAt?: Timestamp;
 }
 
@@ -159,5 +174,44 @@ export const deleteProject = async (id: string): Promise<void> => {
   } catch (error) {
     console.error('Error deleting project:', error);
     throw error;
+  }
+};
+
+// Members
+export const getMembers = async (): Promise<Member[]> => {
+  try {
+    const membersCol = collection(db, COLLECTIONS.MEMBERS);
+    const q = query(membersCol, orderBy('createdAt', 'desc'));
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map((doc: any) => ({ id: doc.id, ...doc.data() } as Member));
+  } catch (error) {
+    console.error('Error fetching members:', error);
+    // Fallback to hardcoded data if Firebase fails
+    return [
+      {
+        id: '1',
+        name: 'John Doe',
+        email: 'john.doe@nstu.edu.bd',
+        role: 'President',
+        department: 'Mechatronics Engineering',
+        image: '/images/member1.jpg',
+        social: {
+          linkedin: 'https://linkedin.com',
+          github: 'https://github.com'
+        }
+      },
+      {
+        id: '2',
+        name: 'Jane Smith',
+        email: 'jane.smith@nstu.edu.bd',
+        role: 'Vice President',
+        department: 'Mechatronics Engineering',
+        image: '/images/member2.jpg',
+        social: {
+          linkedin: 'https://linkedin.com',
+          github: 'https://github.com'
+        }
+      }
+    ];
   }
 };

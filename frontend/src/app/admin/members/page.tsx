@@ -13,6 +13,7 @@ function AdminMembersContent() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
+  const [showEmailModal, setShowEmailModal] = useState(false);
   const [editingMember, setEditingMember] = useState<Member | null>(null);
   const [formData, setFormData] = useState<Partial<Member>>({
     name: '',
@@ -25,6 +26,11 @@ function AdminMembersContent() {
   });
   const [photoPreview, setPhotoPreview] = useState<string>('');
   const [thumbPreview, setThumbPreview] = useState<string>('');
+  // Email modal state
+  const [emailSubject, setEmailSubject] = useState('');
+  const [emailBody, setEmailBody] = useState('');
+  const [sendingEmails, setSendingEmails] = useState(false);
+  const [sendResult, setSendResult] = useState<{ success: number; failed: number }>({ success: 0, failed: 0 });
 
   useEffect(() => {
     loadMembers();
@@ -134,7 +140,8 @@ function AdminMembersContent() {
             </h1>
             <p className="text-gray-400 text-sm md:text-base">Add, edit, or remove club members</p>
           </div>
-          <button
+          <div className="flex items-center gap-3 w-full sm:w-auto">
+            <button
             onClick={() => {
               resetForm();
               setShowModal(true);
@@ -144,7 +151,136 @@ function AdminMembersContent() {
             <Plus className="w-4 h-4 md:w-5 md:h-5" />
             Add Member
           </button>
+
+            {/* Bulk Email Button */}
+            <button
+              onClick={() => {
+                // Pre-fill subject/body with a simple template
+                setEmailSubject('Announcement from NSTU Mechatronics Club');
+                setEmailBody('Hello {{name}},\n\nWe have an update for you:\n\n- Insert your message here -\n\nBest,\nNSTU Mechatronics Club');
+                setShowEmailModal(true);
+              }}
+              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 text-sm bg-white/6 text-white rounded-lg hover:bg-white/8 transition-all"
+            >
+              Send Bulk Email
+            </button>
+          </div>
         </div>
+
+          {/* Bulk Email Modal */}
+          {showEmailModal && (
+            <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="bg-gray-800 rounded-lg md:rounded-xl border border-gray-700 max-w-3xl w-full max-h-[90vh] overflow-y-auto"
+              >
+                <div className="p-4 md:p-6 border-b border-gray-700 flex justify-between items-center sticky top-0 bg-gray-800 z-10">
+                  <h2 className="text-xl md:text-2xl font-bold text-white">Send Bulk Email to Members</h2>
+                  <button
+                    onClick={() => setShowEmailModal(false)}
+                    className="p-2 hover:bg-gray-700 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5 text-gray-400" />
+                  </button>
+                </div>
+
+                <div className="p-4 md:p-6 space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Subject</label>
+                    <input
+                      type="text"
+                      value={emailSubject}
+                      onChange={(e) => setEmailSubject(e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-300 mb-2">Message (use {"{{name}}"} for personalization)</label>
+                    <textarea
+                      rows={8}
+                      value={emailBody}
+                      onChange={(e) => setEmailBody(e.target.value)}
+                      className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white focus:outline-none focus:border-cyan-500"
+                    />
+                  </div>
+
+                  <div className="text-sm text-gray-400">Sending to: <span className="text-white">{filteredMembers.length}</span> members (filtered)</div>
+
+                  <div className="flex gap-4 pt-4">
+                    <button
+                      onClick={async () => {
+                        // Validate inputs
+                        if (!emailSubject.trim() || !emailBody.trim()) {
+                          alert('Subject and message are required.');
+                          return;
+                        }
+
+                        if (filteredMembers.length === 0) {
+                          alert('No members to send to (filtered list is empty).');
+                          return;
+                        }
+
+                        setSendingEmails(true);
+                        setSendResult({ success: 0, failed: 0 });
+
+                        try {
+                          // Get member IDs to send to
+                          const memberIds = filteredMembers.map(m => m.id).filter(Boolean);
+
+                          // Call server endpoint
+                          const response = await fetch('/api/email/send-bulk', {
+                            method: 'POST',
+                            headers: {
+                              'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                              subject: emailSubject,
+                              message: emailBody,
+                              memberIds: memberIds,
+                            }),
+                          });
+
+                          const result = await response.json();
+
+                          if (!response.ok) {
+                            throw new Error(result.error || 'Failed to send emails');
+                          }
+
+                          setSendResult({ success: result.sent, failed: result.failed });
+                          alert(`Emails sent successfully!\nSent: ${result.sent}\nFailed: ${result.failed}\nTotal: ${result.total}`);
+
+                          if (result.errors && result.errors.length > 0) {
+                            console.log('Email errors:', result.errors);
+                          }
+
+                        } catch (error) {
+                          console.error('Bulk email error:', error);
+                          alert(`Failed to send bulk emails: ${error instanceof Error ? error.message : 'Unknown error'}`);
+                        } finally {
+                          setSendingEmails(false);
+                        }
+                      }}
+                      className="flex-1 px-6 py-3 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg hover:from-cyan-600 hover:to-blue-700 transition-all font-medium"
+                      disabled={sendingEmails}
+                    >
+                      {sendingEmails ? 'Sending...' : 'Send Emails'}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => setShowEmailModal(false)}
+                      className="px-6 py-3 bg-gray-700 text-white rounded-lg hover:bg-gray-600 transition-all"
+                      disabled={sendingEmails}
+                    >
+                      Cancel
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            </div>
+          )}
 
         {/* Search */}
         <div className="mb-6 relative">

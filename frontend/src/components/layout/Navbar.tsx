@@ -10,6 +10,7 @@ const navItems = [
   { name: 'Events', href: '/events' },
   { name: 'Projects', href: '/projects' },
   { name: 'Achievements', href: '/achievements' },
+  { name: 'Doctor Finder', href: '/doctor-finder' },
   { name: 'AI Notebook', href: '/notebook' },
 ];
 
