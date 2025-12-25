@@ -7,6 +7,8 @@ import projectsRouter from './routes/projects';
 import achievementsRouter from './routes/achievements';
 import emailRouter from './routes/email';
 import doctorsRouter from './routes/doctors';
+import meetingsRouter from './routes/meetings';
+
 console.log('Doctors router imported:', !!doctorsRouter);
 
 dotenv.config();
@@ -29,6 +31,7 @@ app.use('/api/projects', projectsRouter);
 app.use('/api/achievements', achievementsRouter);
 app.use('/api/email', emailRouter);
 app.use('/api/doctors', doctorsRouter);
+app.use('/api/meetings', meetingsRouter);
 
 app.listen(port, () => {
   console.log(`⚡️[server]: Server is running at http://localhost:${port}`);

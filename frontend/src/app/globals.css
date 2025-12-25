@@ -3,13 +3,18 @@
 :root {
   --background: #000000;
   --foreground: #e0f2fe;
-  /* Lightest Cyan/Blue */
 
-  /* Neon Palette */
+  /* Neon Palette - Enhanced */
   --neon-cyan: #00f3ff;
   --neon-blue: #0066ff;
+  --neon-purple: #bc13fe;
   --neon-green: #0aff00;
   --deep-space: #02040a;
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.05);
+  --glass-blur: 16px;
 }
 
 @theme inline {
@@ -20,20 +25,23 @@
 
   --color-neon-cyan: var(--neon-cyan);
   --color-neon-blue: var(--neon-blue);
+  --color-neon-purple: var(--neon-purple);
   --color-neon-green: var(--neon-green);
+  --color-glass-bg: var(--glass-bg);
 }
 
 body {
-  background: var(--background);
+  background: #000000;
   color: var(--foreground);
   font-family: var(--font-rajdhani), sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   background-image:
-    linear-gradient(to bottom, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-    linear-gradient(to right, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
-  background-size: 40px 40px;
-  background-attachment: fixed;
+    linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-attachment: scroll;
+  /* Optimized from fixed */
 }
 
 /* Headings use Orbitron */
@@ -50,17 +58,17 @@ h6 {
 
 /* Custom Scrollbar - Cyber Style */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #000;
+  background: rgba(2, 4, 10, 0.5);
+  /* Semi-transparent track */
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--neon-cyan);
-  border-radius: 0;
-  box-shadow: 0 0 10px var(--neon-cyan);
+  background: linear-gradient(to bottom, var(--neon-cyan), var(--neon-purple));
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
@@ -69,53 +77,50 @@ h6 {
 
 /* Utility Classes */
 
-/* Holographic Card */
+/* Premium Glass Card */
+.glass-card {
+  background: rgba(0, 0, 0, 0.4);
+  /* Darker base for video contrast */
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  will-change: transform, background, box-shadow;
+  backface-visibility: hidden;
+}
+
+.glass-card:hover {
+  background: rgba(0, 0, 0, 0.6);
+  border-color: rgba(0, 243, 255, 0.3);
+  transform: translateY(-4px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Holographic / Neon Card legacy support with upgrade */
 .holo-card {
-  background: rgba(2, 4, 10, 0.7);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(0, 243, 255, 0.2);
+  background: rgba(2, 4, 10, 0.5);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 243, 255, 0.15);
   box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
   position: relative;
   overflow: hidden;
   transition: all 0.3s ease;
-}
-
-.holo-card::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 243, 255, 0.1), transparent);
-  transition: 0.5s;
-}
-
-.holo-card:hover::before {
-  left: 100%;
+  border-radius: 12px;
 }
 
 .holo-card:hover {
   border-color: var(--neon-cyan);
-  box-shadow: 0 0 20px rgba(0, 243, 255, 0.2);
-  transform: translateY(-2px);
-}
-
-/* Neon Text */
-.text-neon-cyan {
-  color: var(--neon-cyan);
-  text-shadow: 0 0 10px rgba(0, 243, 255, 0.7);
-}
-
-.text-neon-green {
-  color: var(--neon-green);
-  text-shadow: 0 0 10px rgba(10, 255, 0, 0.7);
+  box-shadow: 0 0 25px rgba(0, 243, 255, 0.25);
+  transform: translateY(-3px);
+  background: rgba(2, 4, 10, 0.7);
 }
 
 /* Cyber Button */
 .cyber-button {
   position: relative;
-  background: transparent;
+  background: rgba(0, 243, 255, 0.1);
   border: 1px solid var(--neon-cyan);
   color: var(--neon-cyan);
   text-transform: uppercase;
@@ -123,16 +128,69 @@ h6 {
   letter-spacing: 2px;
   overflow: hidden;
   transition: 0.3s;
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+  clip-path: polygon(15px 0, 100% 0, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0 100%, 0 15px);
 }
 
 .cyber-button:hover {
   background: var(--neon-cyan);
   color: #000;
-  box-shadow: 0 0 30px var(--neon-cyan);
+  box-shadow: 0 0 40px var(--neon-cyan);
+  text-shadow: none;
+}
+
+.cyber-button-disabled {
+  border-color: #333;
+  color: #555;
+  cursor: not-allowed;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.cyber-button-disabled:hover {
+  background: rgba(0, 0, 0, 0.5);
+  color: #555;
+  box-shadow: none;
 }
 
 /* Animations */
+@keyframes pulse-glow {
+
+  0%,
+  100% {
+    box-shadow: 0 0 10px var(--neon-cyan);
+  }
+
+  50% {
+    box-shadow: 0 0 25px var(--neon-cyan), 0 0 5px var(--neon-purple);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 3s infinite;
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+}
+
+.text-gradient {
+  background: linear-gradient(to right, var(--neon-cyan), var(--neon-purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
 @keyframes scanline {
   0% {
     transform: translateY(-100%);
@@ -153,55 +211,6 @@ h6 {
   background-size: 100% 4px;
   animation: scanline 10s linear infinite;
   pointer-events: none;
-}
-
-@keyframes glitch {
-  0% {
-    transform: translate(0);
-  }
-
-  20% {
-    transform: translate(-2px, 2px);
-  }
-
-  40% {
-    transform: translate(-2px, -2px);
-  }
-
-  60% {
-    transform: translate(2px, 2px);
-  }
-
-  80% {
-    transform: translate(2px, -2px);
-  }
-
-  100% {
-    transform: translate(0);
-  }
-}
-
-.animate-glitch:hover {
-  animation: glitch 0.3s cubic-bezier(.25, .46, .45, .94) both infinite;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  contain: strict;
+  will-change: transform;
 }

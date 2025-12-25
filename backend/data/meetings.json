@@ -1,0 +1,32 @@
+[
+  {
+    "id": "1766651941747",
+    "title": "gff",
+    "description": "",
+    "startTime": "2025-12-25T08:39:00.000Z",
+    "endTime": "2025-12-25T09:38:00.000Z",
+    "meetingLink": "https://meet.jit.si/NSTUMC-gff-1766651937490",
+    "meetingCode": "123",
+    "createdAt": "2025-12-25T08:39:01.748Z"
+  },
+  {
+    "id": "1766653978517",
+    "title": "Agora Verify",
+    "description": "Verification of Agora integration",
+    "startTime": "2025-12-25T15:00:00.000Z",
+    "endTime": "2025-12-25T16:00:00.000Z",
+    "meetingLink": "https://meet.jit.si/agora-verify",
+    "meetingCode": "agora-verify",
+    "createdAt": "2025-12-25T09:12:58.519Z"
+  },
+  {
+    "id": "1766655510388",
+    "title": "f",
+    "description": "",
+    "startTime": "2025-12-25T09:38:00.000Z",
+    "endTime": "2025-12-25T10:38:00.000Z",
+    "meetingLink": "NSTUMC-New-Meeting-245543",
+    "meetingCode": "1",
+    "createdAt": "2025-12-25T09:38:30.388Z"
+  }
+]

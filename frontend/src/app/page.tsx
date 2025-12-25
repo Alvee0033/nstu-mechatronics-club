@@ -4,15 +4,19 @@ import { motion, useScroll, useTransform } from 'framer-motion';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { useEffect, useState, useRef } from 'react';
-import WhatWeOffer from '@/components/sections/WhatWeOffer';
 import { ArrowRight, Zap, Target, Award, Users, Calendar, FolderGit2, Cpu, Globe, Rocket, Terminal } from 'lucide-react';
 import { preloadMembers } from '@/lib/cache';
 import { getProjects, getEvents } from '@/lib/firestore';
+
 
 // Lazy load ParticleBackground
 const ParticleBackground = dynamic(() => import('@/components/ui/ParticleBackground'), {
   ssr: false,
   loading: () => null,
+});
+
+const WhatWeOffer = dynamic(() => import('@/components/sections/WhatWeOffer'), {
+  loading: () => <div className="h-96 flex items-center justify-center text-cyan-500/50">Loading Protocol...</div>
 });
 
 export default function Home() {
@@ -83,11 +87,14 @@ export default function Home() {
 
   return (
     <div className="min-h-screen text-white selection:bg-neon-cyan/30">
+
       {/* Hero Section */}
-      <section className="relative min-h-screen flex flex-col justify-center items-center overflow-hidden pt-20 pb-10">
+      {/* Hero Section - Terminal Style (Compacted & Enhanced) */}
+      <section className="relative min-h-[95vh] flex flex-col justify-center items-center overflow-hidden pt-40 pb-20 transform-gpu">
+
         {/* Background Video */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-black/40 z-10" />
+        <div className="absolute inset-0 z-0 transform-gpu will-change-transform">
+          <div className="absolute inset-0 bg-black/50 z-10" /> {/* Slightly lighter overlay for glass effect */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_0%,#000_100%)] z-10" />
           <video
             ref={videoRef}
@@ -95,257 +102,138 @@ export default function Home() {
             loop
             muted
             playsInline
-            className="w-full h-full object-cover scale-105"
-            style={{ filter: 'brightness(0.8) contrast(1.1)' }}
+            poster="/hero-poster.jpg"
+            className="w-full h-full object-cover scale-105 transform-gpu will-change-transform"
+            style={{ filter: 'brightness(0.9) contrast(1.1) saturate(1.1)' }}
           >
             <source src="/background-video.mp4" type="video/mp4" />
           </video>
         </div>
 
-        {/* Cyber Grid Overlay */}
-        <div className="absolute inset-0 z-10 pointer-events-none bg-[linear-gradient(to_right,#00f3ff15_1px,transparent_1px),linear-gradient(to_bottom,#00f3ff15_1px,transparent_1px)] bg-[size:40px_40px]" style={{ boxShadow: 'inset 0 0 100px rgba(0,243,255,0.1)' }} />
+        {/* Global Grid Overlay */}
+        <div className="absolute inset-0 z-10 pointer-events-none bg-[linear-gradient(to_right,#00f3ff05_1px,transparent_1px),linear-gradient(to_bottom,#00f3ff05_1px,transparent_1px)] bg-[size:40px_40px] transform-gpu" />
 
-        {/* Particle Effect */}
-        <div className="absolute inset-0 z-10 pointer-events-none opacity-40">
-          <ParticleBackground />
-        </div>
+        <div className="container mx-auto px-4 z-20 relative flex flex-col items-center text-center">
 
-        {/* Hero Content */}
-        <motion.div
-          style={{ opacity, scale, y }}
-          className="container mx-auto px-4 z-20 relative flex flex-col items-center text-center"
-        >
-          {/* Main Title */}
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.8 }}
-            className="mb-12 max-w-7xl"
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.8 }}
+            className="w-full max-w-5xl relative z-20"
           >
-            {/* Terminal-style header */}
-            <div className="flex items-center justify-center gap-3 mb-10">
-              <motion.div
-                className="flex items-center gap-2.5 px-5 py-2.5 bg-black/60 border border-cyan-400/40 backdrop-blur-sm rounded-lg"
-                animate={{
-                  boxShadow: [
-                    '0 0 10px rgba(0,243,255,0.2)',
-                    '0 0 20px rgba(0,243,255,0.4)',
-                    '0 0 10px rgba(0,243,255,0.2)'
-                  ]
-                }}
-                transition={{ duration: 2, repeat: Infinity }}
-              >
-                <span className="w-2 h-2 bg-neon-green rounded-full animate-pulse"></span>
-                <span className="text-neon-green text-xs font-mono tracking-wider font-bold">SYSTEM_ONLINE</span>
-              </motion.div>
-            </div>
+            {/* Terminal Window Frame - Ultra Clear (Minimal Blur) */}
+            <div className="relative bg-[#00000005] border border-cyan-500/30 rounded-xl overflow-hidden backdrop-blur-sm shadow-[0_0_60px_rgba(0,243,255,0.1)] group max-w-4xl mx-auto border-opacity-40 transform-gpu [backface-visibility:hidden]">
 
-            {/* Title with word animation */}
-            <div className="flex flex-col items-center justify-center mb-6">
-              <h1 className="font-display font-black tracking-tight leading-[1.1] text-center">
-                {/* Animated words */}
-                <div className="flex flex-wrap items-center justify-center gap-x-4 gap-y-2 mb-3">
-                  <motion.span
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3, duration: 0.6 }}
-                    className="text-white text-5xl sm:text-6xl md:text-7xl lg:text-8xl relative group cursor-pointer"
-                    style={{
-                      textShadow: '0 0 20px rgba(255,255,255,0.3)',
-                      fontFamily: 'var(--font-orbitron)'
-                    }}
-                    whileHover={{
-                      scale: 1.05,
-                      textShadow: '0 0 30px rgba(255,255,255,0.6)'
-                    }}
-                  >
-                    FUTURE
-                    {/* Scribble underline */}
-                    <motion.svg
-                      className="absolute -bottom-2 left-0 w-full h-4 opacity-0 group-hover:opacity-100"
-                      viewBox="0 0 200 10"
-                    >
-                      <motion.path
-                        d="M 5 5 Q 50 2, 100 5 T 195 5"
-                        stroke="#00f3ff"
-                        strokeWidth="2"
-                        fill="none"
-                        strokeLinecap="round"
-                        initial={{ pathLength: 0 }}
-                        whileHover={{ pathLength: 1 }}
-                        transition={{ duration: 0.5, ease: "easeInOut" }}
-                        style={{ filter: 'drop-shadow(0 0 4px rgba(0,243,255,0.8))' }}
-                      />
-                    </motion.svg>
-                  </motion.span>
+              {/* Top Right Code Snippet */}
+              <div className="absolute top-14 right-8 text-[10px] font-mono text-cyan-500/60 text-right hidden md:block select-none leading-relaxed z-10">
+                <span className="text-cyan-400">const</span> init = () =&gt; {'{'}<br />
+                &nbsp;&nbsp;system.boot();<br />
+                &nbsp;&nbsp;ai.connect();<br />
+                &nbsp;&nbsp;<span className="text-purple-400">return</span> future;<br />
+                {'}'}
+                <div className="mt-2 opacity-50">
+                  while(alive) {'{'}<br />
+                  &nbsp;&nbsp;innovate();<br />
+                  &nbsp;&nbsp;create();<br />
+                  &nbsp;&nbsp;disrupt();<br />
+                  {'}'}
+                </div>
+              </div>
 
-                  <motion.span
-                    initial={{ opacity: 0, scale: 0.5 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.5, duration: 0.6 }}
-                    className="text-neon-cyan text-5xl sm:text-6xl md:text-7xl lg:text-8xl"
-                    style={{ fontFamily: 'var(--font-orbitron)' }}
-                  >
-                    IS
-                  </motion.span>
+              {/* Internal Grid - Barely Visible */}
+              <div className="absolute inset-0 z-0 pointer-events-none opacity-[0.03] bg-[linear-gradient(rgba(0,243,255,0.3)_1px,transparent_1px),linear-gradient(90deg,rgba(0,243,255,0.3)_1px,transparent_1px)] bg-[size:30px_30px]" />
+
+              {/* Terminal Header Bar */}
+              <div className="bg-black/20 px-4 py-2 flex items-center gap-4 border-b border-cyan-500/10 relative z-20">
+                <div className="flex gap-2">
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#ff5f56] shadow-[0_0_5px_rgba(255,95,86,0.5)]"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#ffbd2e] shadow-[0_0_5px_rgba(255,189,46,0.5)]"></div>
+                  <div className="w-2.5 h-2.5 rounded-full bg-[#27c93f] shadow-[0_0_5px_rgba(39,201,63,0.5)]"></div>
+                </div>
+                <div className="flex-1 text-center font-mono text-[10px] md:text-xs text-cyan-500/80 tracking-[0.1em] drop-shadow-md">
+                  user@nstu-mecha:~/protocol_init
+                </div>
+                <div className="w-14"></div>
+              </div>
+
+              {/* Terminal Content */}
+              <div className="p-8 md:p-12 relative flex flex-col items-start text-left">
+
+                {/* Boot Sequence - Enhanced Visibility */}
+                <div className="w-full font-mono text-xs md:text-sm text-[#0f0] mb-6 space-y-1 opacity-100 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] relative z-20">
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.2 }}>
+                    <span className="text-neon-cyan">➜</span> <span className="text-pink-500">~</span> initialize_sequence --force
+                  </motion.div>
+                  <div className="h-4"></div> {/* Spacer */}
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.4 }} className="text-yellow-400">
+                    [LOADING] <span className="text-white">Neural Interface...</span> <span className="text-[#0f0]">OK</span>
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.6 }} className="text-yellow-400">
+                    [LOADING] <span className="text-white">Mechatronic Systems...</span> <span className="text-[#0f0]">OK</span>
+                  </motion.div>
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.8 }} className="text-yellow-400">
+                    [LOADING] <span className="text-white">Future Protocols...</span> <span className="text-[#0f0]">READY</span>
+                  </motion.div>
                 </div>
 
-                <motion.span
-                  initial={{ opacity: 0, y: 50 }}
+                {/* Main Glitch Text - Enhanced Visibility & Smaller */}
+                <div className="mb-6 relative z-10 w-full drop-shadow-[0_2px_4px_rgba(0,0,0,0.9)]">
+                  <h1 className="font-black font-display tracking-tighter leading-[0.9] select-none">
+                    <div className="text-3xl md:text-5xl text-white mb-1 shadow-black">{'<THE_/>'}</div>
+                    <div className="text-3xl md:text-5xl text-white mb-2 shadow-black">{'FUTURE/>'}</div>
+                    <div className="text-4xl md:text-6xl lg:text-[4.5rem] text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-[#bc13fe] to-neon-cyan animate-text-gradient filter drop-shadow-[0_0_15px_rgba(0,243,255,0.4)] transform-gpu will-change-[background-position]">
+                      IS_ENGINEERED
+                      <span className="animate-pulse text-neon-cyan inline-block translate-y-1 ml-1">|</span>
+                    </div>
+                  </h1>
+                </div>
+
+                {/* Subtitle - Enhanced Visibility */}
+                <div className="font-mono text-xs md:text-sm text-gray-200 mb-8 space-y-1 drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]">
+                  <motion.p initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.0 }}>
+                    // Architecting the next generation of Mechatronics.
+                  </motion.p>
+                  <motion.p initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.2 }}>
+                    // Fusing mechanics, electronics, and AI into Singularity.
+                  </motion.p>
+                </div>
+
+                {/* Actions */}
+                <motion.div
+                  initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.7, duration: 0.6 }}
-                  className="block text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-cyan-300 to-neon-cyan text-6xl sm:text-7xl md:text-8xl lg:text-9xl relative group cursor-pointer"
-                  style={{
-                    textShadow: '0 0 40px rgba(0,243,255,0.6)',
-                    fontFamily: 'var(--font-orbitron)',
-                    WebkitTextStroke: '1px rgba(0,243,255,0.3)'
-                  }}
-                  whileHover={{
-                    scale: 1.05,
-                    filter: 'brightness(1.2)'
-                  }}
+                  transition={{ delay: 1.4 }}
+                  className="flex flex-wrap gap-4 w-full"
                 >
-                  ENGINEERED
-                  {/* Scribble underline */}
-                  <motion.svg
-                    className="absolute -bottom-4 left-0 w-full h-6 opacity-0 group-hover:opacity-100"
-                    viewBox="0 0 500 15"
-                  >
-                    <motion.path
-                      d="M 5 8 Q 125 5, 250 8 T 495 8"
-                      stroke="#00f3ff"
-                      strokeWidth="3"
-                      fill="none"
-                      strokeLinecap="round"
-                      initial={{ pathLength: 0 }}
-                      whileHover={{ pathLength: 1 }}
-                      transition={{ duration: 0.6, ease: "easeInOut" }}
-                      style={{ filter: 'drop-shadow(0 0 6px rgba(0,243,255,0.9))' }}
-                    />
-                  </motion.svg>
-                </motion.span>
-              </h1>
+                  <Link href="/register">
+                    <button className="px-8 py-3 bg-neon-cyan text-black font-bold font-mono tracking-wider hover:bg-white transition-colors duration-300 clip-path-polygon flex items-center gap-2">
+                      &gt; JOIN_NOW
+                    </button>
+                  </Link>
+                  <Link href="/projects">
+                    <button className="px-8 py-3 border border-neon-cyan/50 text-neon-cyan font-bold font-mono tracking-wider hover:bg-neon-cyan/10 transition-colors duration-300 flex items-center gap-2">
+                      &gt; VIEW_PROJECTS
+                    </button>
+                  </Link>
+                </motion.div>
+
+              </div>
             </div>
           </motion.div>
-
-          {/* Subtitle */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.9, duration: 0.8 }}
-            className="mb-14 max-w-3xl mx-auto"
-          >
-            <p className="text-base md:text-lg text-cyan-100/80 font-mono leading-relaxed text-center">
-              <span className="text-cyan-400 mr-2">//</span>
-              Architecting the next generation of <span className="text-neon-cyan font-bold">Mechatronics</span>.
-              <br />
-              <span className="text-cyan-400 mr-2">//</span>
-              Fusing mechanics, electronics, and AI into <span className="text-neon-green font-bold">Singularity</span>.
-            </p>
-          </motion.div>
-
-          {/* CTA Buttons */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 1.1, duration: 0.8 }}
-            className="flex flex-col sm:flex-row gap-5 w-full sm:w-auto px-4 justify-center"
-          >
-            <Link href="/register" className="w-full sm:w-auto">
-              <motion.button
-                className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-neon-cyan border-2 border-neon-cyan/70 bg-black/60 backdrop-blur-sm font-display tracking-wider relative overflow-hidden group rounded-lg"
-                whileHover={{
-                  scale: 1.03,
-                  borderColor: 'rgba(0,243,255,0.9)',
-                  backgroundColor: 'rgba(0,243,255,0.1)',
-                  boxShadow: '0 0 30px rgba(0,243,255,0.4)'
-                }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* Subtle gradient background on hover */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-cyan-400/20 to-transparent opacity-0 group-hover:opacity-100"
-                  transition={{ duration: 0.3 }}
-                />
-
-                <span className="flex items-center justify-center gap-2.5 relative z-10">
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Rocket className="w-4 h-4" />
-                  </motion.div>
-                  INITIALIZE
-                </span>
-              </motion.button>
-            </Link>
-
-            <Link href="/projects" className="w-full sm:w-auto">
-              <motion.button
-                className="w-full sm:w-auto px-8 py-3.5 text-sm font-bold text-orange-300 border-2 border-orange-600/70 bg-black/60 backdrop-blur-sm font-display tracking-wider relative overflow-hidden group rounded-lg"
-                whileHover={{
-                  scale: 1.03,
-                  borderColor: 'rgba(234,88,12,0.9)',
-                  backgroundColor: 'rgba(234,88,12,0.1)',
-                  boxShadow: '0 0 30px rgba(234,88,12,0.4)'
-                }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ duration: 0.2 }}
-              >
-                {/* Subtle gradient background on hover */}
-                <motion.div
-                  className="absolute inset-0 bg-gradient-to-r from-transparent via-orange-400/20 to-transparent opacity-0 group-hover:opacity-100"
-                  transition={{ duration: 0.3 }}
-                />
-
-                <span className="flex items-center justify-center gap-2.5 relative z-10">
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.2 }}
-                  >
-                    <Cpu className="w-4 h-4" />
-                  </motion.div>
-                  Explore Systems
-                </span>
-              </motion.button>
-            </Link>
-          </motion.div>
-        </motion.div>
+        </div>
 
         {/* Scroll Indicator */}
         <motion.div
           initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5, duration: 1 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 z-20 hidden md:flex flex-col items-center gap-2 cursor-pointer group"
-          onClick={() => {
-            const statsSection = document.getElementById('stats-section');
-            if (statsSection) {
-              statsSection.scrollIntoView({ behavior: 'smooth' });
-            }
-          }}
+          animate={{ opacity: 0.5 }}
+          transition={{ delay: 1, duration: 1 }}
+          className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         >
-          <span className="text-[10px] uppercase tracking-[0.5em] text-neon-cyan font-display animate-pulse group-hover:text-white transition-colors">
-            Initialize_Descent
-          </span>
-          <div className="relative w-6 h-10 border-2 border-neon-cyan/30 rounded-full flex justify-center p-1 group-hover:border-neon-cyan transition-colors shadow-[0_0_10px_rgba(0,243,255,0.2)]">
-            <motion.div
-              className="w-1 h-2 bg-neon-cyan rounded-full"
-              animate={{
-                y: [0, 15, 0],
-                opacity: [1, 0, 1]
-              }}
-              transition={{
-                duration: 1.5,
-                repeat: Infinity,
-                ease: "easeInOut"
-              }}
-            />
-          </div>
-          <div className="h-8 w-[1px] bg-gradient-to-b from-neon-cyan to-transparent opacity-50" />
+          <span className="text-[10px] font-mono text-neon-cyan tracking-[0.3em]">SCROLL_DOWN</span>
+          <div className="w-[1px] h-12 bg-gradient-to-b from-neon-cyan to-transparent"></div>
         </motion.div>
-      </section >
+
+      </section>
 
       {/* Stats Section - Holographic Cards */}
       < section id="stats-section" className="relative z-20 py-24 px-4" >

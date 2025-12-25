@@ -18,7 +18,8 @@ import {
   LogOut,
   Terminal,
   Shield,
-  Cpu
+  Cpu,
+  Video
 } from 'lucide-react';
 import { getMembers, getEvents, getProjects, getAchievements, getRegistrations, getFinancialStats, getSettings, updateSettings, Settings } from '@/lib/firestore';
 import { isAdminLoggedIn, getAdminUsername, adminLogout } from '@/lib/auth';
@@ -163,6 +164,14 @@ function AdminDashboardContent() {
       description: 'Manage achievements',
       count: stats.achievements,
       color: 'text-yellow-400',
+    },
+    {
+      title: 'Meetings',
+      href: '/admin/meetings',
+      icon: Video,
+      description: 'Schedule & manage meetings',
+      count: 'ACTIVE',
+      color: 'text-purple-400',
     },
     {
       title: 'Invoices',
