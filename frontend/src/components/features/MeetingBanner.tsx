@@ -85,7 +85,7 @@ export default function MeetingBanner() {
             if (data.success && data.meetingLink) {
                 // Navigate to Agora meeting room using the room code
                 const roomCode = data.meetingLink;
-                window.location.assign(`/meet/${roomCode}`);
+                window.location.assign(`/meet?id=${roomCode}`);
                 setShowModal(false);
             } else {
                 setError('Invalid Meeting Code');

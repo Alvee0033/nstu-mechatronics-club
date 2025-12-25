@@ -33,7 +33,7 @@ export default function Navbar() {
             <motion.nav
                 initial={{ y: -100, x: "-50%" }}
                 animate={{ y: 0, x: "-50%" }}
-                className="fixed top-8 left-1/2 z-50 w-[95%] max-w-6xl transform-gpu will-change-transform [backface-visibility:hidden]"
+                className="fixed top-4 md:top-8 left-1/2 z-50 w-[95%] max-w-6xl transform-gpu will-change-transform [backface-visibility:hidden]"
             >
                 <div className="relative bg-black/30 backdrop-blur-2xl border border-cyan-500/30 rounded-2xl px-8 py-4 flex items-center justify-between shadow-[0_0_25px_rgba(0,243,255,0.15)] overflow-hidden transform-gpu">
 

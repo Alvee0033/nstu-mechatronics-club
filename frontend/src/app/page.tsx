@@ -90,7 +90,8 @@ export default function Home() {
 
       {/* Hero Section */}
       {/* Hero Section - Terminal Style (Compacted & Enhanced) */}
-      <section className="relative min-h-[95vh] flex flex-col justify-center items-center overflow-hidden pt-40 pb-20 transform-gpu">
+      {/* Hero Section - Terminal Style (Compacted & Enhanced) */}
+      <section className="relative min-h-[95vh] flex flex-col justify-center items-center overflow-hidden pt-28 md:pt-40 pb-20 transform-gpu">
 
         {/* Background Video */}
         <div className="absolute inset-0 z-0 transform-gpu will-change-transform">
@@ -181,7 +182,7 @@ export default function Home() {
                   <h1 className="font-black font-display tracking-tighter leading-[0.9] select-none">
                     <div className="text-3xl md:text-5xl text-white mb-1 shadow-black">{'<THE_/>'}</div>
                     <div className="text-3xl md:text-5xl text-white mb-2 shadow-black">{'FUTURE/>'}</div>
-                    <div className="text-4xl md:text-6xl lg:text-[4.5rem] text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-[#bc13fe] to-neon-cyan animate-text-gradient filter drop-shadow-[0_0_15px_rgba(0,243,255,0.4)] transform-gpu will-change-[background-position]">
+                    <div className="text-3xl md:text-6xl lg:text-[4.5rem] text-transparent bg-clip-text bg-gradient-to-r from-neon-cyan via-[#bc13fe] to-neon-cyan animate-text-gradient filter drop-shadow-[0_0_15px_rgba(0,243,255,0.4)] transform-gpu will-change-[background-position]">
                       IS_ENGINEERED
                       <span className="animate-pulse text-neon-cyan inline-block translate-y-1 ml-1">|</span>
                     </div>
@@ -269,8 +270,8 @@ export default function Home() {
       {/* Featured Projects Section */}
       < section className="py-32 px-4 relative" >
         {/* Background Elements */}
-        < div className="absolute top-0 right-0 w-[500px] h-[500px] bg-neon-blue/10 rounded-full blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-neon-cyan/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-0 right-0 w-[80vw] max-w-[500px] h-[500px] bg-neon-blue/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-[80vw] max-w-[500px] h-[500px] bg-neon-cyan/10 rounded-full blur-[120px] pointer-events-none" />
 
         <div className="container mx-auto relative z-10">
           <motion.div
@@ -354,13 +355,13 @@ export default function Home() {
         <div className="container mx-auto relative z-10">
           <div className="max-w-5xl mx-auto text-center relative">
             {/* Glow Effect */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-neon-cyan/10 rounded-full blur-[120px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[90vw] max-w-[600px] h-[600px] bg-neon-cyan/10 rounded-full blur-[120px] pointer-events-none" />
 
             <motion.div
               initial={{ opacity: 0, scale: 0.95 }}
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
-              className="relative holo-card p-12 md:p-20 overflow-hidden"
+              className="relative holo-card p-6 md:p-20 overflow-hidden"
             >
               <Globe className="w-20 h-20 mx-auto mb-8 text-neon-cyan animate-pulse drop-shadow-[0_0_20px_rgba(0,243,255,0.8)]" />
 

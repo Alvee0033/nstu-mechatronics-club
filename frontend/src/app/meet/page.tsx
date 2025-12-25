@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useEffect, useState, Suspense } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { Loader2, ArrowLeft, Clock, Video, Lock } from "lucide-react";
 import Link from 'next/link';
 import { motion } from "framer-motion";
@@ -15,12 +15,14 @@ interface Meeting {
     startTime: string; // ISO
     endTime: string;
     meetingLink: string;
+    meetingCode?: string;
 }
 
-export default function MeetingPage() {
-    const params = useParams();
-    const roomId = params?.id as string;
+function MeetingInternal() {
+    const searchParams = useSearchParams();
+    const roomId = searchParams.get('id');
 
+    // Fallback if no ID
     const [meeting, setMeeting] = useState<Meeting | null>(null);
     const [loading, setLoading] = useState(true);
     const [timeLeft, setTimeLeft] = useState("");
@@ -28,27 +30,45 @@ export default function MeetingPage() {
 
     useEffect(() => {
         const fetchMeeting = async () => {
+            if (!roomId) {
+                setLoading(false);
+                return;
+            }
             try {
                 // Fetch all meetings to find the one matching this room ID
-                const res = await fetch('http://localhost:5000/api/meetings');
+                // Note: In static export, localhost:5000 might not be reachable if deployed.
+                // But this code runs on client.
+                const res = await fetch('http://localhost:5000/api/meetings'); // TODO: Configure URL based on env
                 const data = await res.json();
 
-                // Logic: The room ID in URL (e.g. "NSTUMC-Test-123") is part of the stored meetingLink
+                // Logic: The room ID (e.g. "NSTUMC-Test-123") is part of the stored meetingLink
                 const found = data.find((m: any) => m.meetingLink && m.meetingLink.includes(roomId));
 
                 // Fallback for debug/direct rooms
                 setMeeting(found || {
+                    id: 'debug',
                     title: "SECURE CHANNEL",
                     startTime: new Date().toISOString(),
-                    meetingLink: roomId
+                    endTime: new Date(Date.now() + 3600000).toISOString(),
+                    meetingLink: roomId,
+                    meetingCode: roomId // hidden
                 });
             } catch (error) {
                 console.error("Failed to fetch meeting", error);
+                // Fallback even on error
+                setMeeting({
+                    id: 'offline',
+                    title: "SECURE CHANNEL (OFFLINE)",
+                    startTime: new Date().toISOString(),
+                    endTime: new Date(Date.now() + 3600000).toISOString(),
+                    meetingLink: roomId,
+                    meetingCode: roomId
+                });
             } finally {
                 setLoading(false);
             }
         };
-        if (roomId) fetchMeeting();
+        fetchMeeting();
     }, [roomId]);
 
     // Timer logic
@@ -75,6 +95,12 @@ export default function MeetingPage() {
         <div className="bg-black h-screen flex items-center justify-center text-cyan-500 font-mono tracking-widest">
             <Loader2 className="animate-spin w-10 h-10 mb-4" />
             <span>ESTABLISHING UPLINK...</span>
+        </div>
+    );
+
+    if (!roomId) return (
+        <div className="bg-black h-screen flex items-center justify-center text-red-500 font-mono tracking-widest">
+            <span>NO SIGNAL. MISSING ID.</span>
         </div>
     );
 
@@ -149,5 +175,13 @@ export default function MeetingPage() {
                 </div>
             )}
         </div>
+    );
+}
+
+export default function MeetingPage() {
+    return (
+        <Suspense fallback={<div className="bg-black text-cyan-500 p-10">LOADING MODULE...</div>}>
+            <MeetingInternal />
+        </Suspense>
     );
 }

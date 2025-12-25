@@ -214,7 +214,7 @@ export default function AdminMeetingsPage() {
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <a
-                                        href={`/meet/${meeting.meetingLink}`}
+                                        href={`/meet?id=${meeting.meetingLink}`}
                                         className="p-2 rounded-full hover:bg-cyan-500/20 text-gray-500 hover:text-cyan-500 transition-colors"
                                         title="Launch Meeting"
                                     >

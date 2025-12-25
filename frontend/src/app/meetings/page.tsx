@@ -41,13 +41,13 @@ const MeetingCard = ({ meeting, index }: { meeting: Meeting; index: number }) =>
     // Get the join link for the meeting
     const getJoinLink = () => {
         // Use meetingCode if available, otherwise use meetingLink as the room code
-        if (meeting.meetingCode) return `/meet/${meeting.meetingCode}`;
+        if (meeting.meetingCode) return `/meet?id=${meeting.meetingCode}`;
 
         // If link is already internal (/meet/...), use it
         if (meeting.meetingLink?.startsWith('/')) return meeting.meetingLink;
 
         // Otherwise, treat meetingLink as the Agora room code
-        return `/meet/${meeting.meetingLink}`;
+        return `/meet?id=${meeting.meetingLink}`;
     };
 
     return (
